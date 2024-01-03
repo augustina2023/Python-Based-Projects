@@ -10,9 +10,11 @@ The data set sourced from OASIS was cleaned, underwent some feature engineering.
 Multiple classifier models were tested for performance in this program. The selected ML was selected best on the best accuracy.
 
 ## Visualizing MRI Images in 3D Slicer
-
+The prupose of this program was to explore and visualize medical images in 3D Slicer and Simple ITK and to apply simple transformations to the images.
 
 ## Segmentation of MRI Images
 ### Utils
-
+In this section, several things were done: volume pre-processing, testing of different filters for enhancement and segmentation, and the selection and improvement of a segmentation mask.
+In the pre-processing step, the volume was rescaled to the range 0-255. Due to the large number of grey pixels in the volume, enhancing filters were used to brighten the image. The Median filter, Mean filter, and the Intensity Window filters were tried and tested. From there, thresholding was performed for the segmentation phase using the Binary Threshold Filter, and a combination of the Binary and Median filters, and the Confidence Connected. Finally, a clean up was performed on the selected segmentation filter using a vector filter which implements binary morphological operations, such as Binary Morphological Opening and Binary Morphological Closing.
 ### Main
+Main function that calls the functions in the 'utils.py' file.
