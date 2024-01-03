@@ -3,7 +3,6 @@
 # Augustina Ashie: 20411977
 # Date created: July 16, 2023,          Last modified: July 21, 2023, 20:00
 
-# GitHub Repository: https://github.com/augustina2023/BMIF804/blob/pycharm/MP-Pycharm-%20utils
 # ----------------------------------------------------------------------------------------------------------------------
 import SimpleITK as sitk
 import matplotlib.pyplot as plt
