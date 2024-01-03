@@ -1,0 +1,116 @@
+# This program creates different classifiers (Random Forest, KNN, SVC, MLP, and Gaussian NB), compares them to each other to see which model is superior.
+# The goal is to determine which ML model is able to draw strong correlations between the predictors that contribute to CDR scores in patients with AD.
+
+# Set X (predictors) and y (outcome)
+X = new_df[['Age', 'Educ', 'SES', 'MMSE', 'nWBV']]
+y = new_df['CDR Y/N']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+
+clf = RandomForestClassifier(n_estimators=200, random_state=12)
+clf.fit(X_train, y_train)
+
+# Check shape/dimensions of the training and the testing sets
+X_train.shape
+X_test.shape
+
+predicted = clf.predict(X_test)
+expected = y_test
+
+print('The accuracy is ', f'{clf.score(X_test, y_test):.2%}')
+
+# Create a loop that takes 2 columns at a time to determine the accuracy (in classifier)
+base_path = 'C:/Users/augustina/Documents/802/report 802/'
+file_path = base_path + 'AD_w_YN_CDR.csv'
+diff_df = pd.read_csv(file_path)
+
+# Creates a list from the headers in the dataset and performs pairwise matching without duplicates.
+header_list = new_df.columns[:-1]  # remove the CDR column to create feature pairs
+# print(header_list)
+pair_order = itertools.combinations(header_list, 2)
+
+num = 0
+feature_list = list(pair_order)
+
+# Iterates through list of column pairs, creating a separate csv for each one (to then be run through model below).
+for i in feature_list:
+    two_col_df = diff_df[[i[0],i[1]]].copy()
+    version_num = str(num)
+    tail = 'updated_col_{}.csv'.format(version_num)
+    path = base_path + str(tail)
+    two_col_df.to_csv(path)
+    num += 1
+print('28 FILES SAVED')
+
+j = 0
+accur_list = []
+clf = RandomForestClassifier(n_estimators=200, random_state=12)
+y = diff_df['CDR Y/N']
+
+while j < 15:
+    tail = 'updated_col_{}.csv'.format(j)
+    path = base_path + str(tail)
+    two_col_df = pd.read_csv(path)
+    X_train, X_test, y_train, y_test = train_test_split(two_col_df, y, random_state=12, test_size=0.2)
+    clf.fit(X_train, y_train)
+    y_predicted = clf.predict(X_test)
+    accuracy_score = clf.score(X_test, y_test)
+    accur_list.append(accuracy_score)
+    print(f"The accuracy for the feature combination of {feature_list[j][0]} and {feature_list[j][1]} is "
+          f"{accuracy_score}")
+    j += 1
+
+# print(accur_list)
+
+# This loop iterates through items in the estimators' dictionary. For each key-value pair, it unpacks the key into
+# estimator_name and value into estimator_object.
+estimators = {"KNN": KNeighborsClassifier(n_neighbors=11),
+              "SVC": SVC(kernel='rbf', gamma='scale'),
+              "GaussianNB": GaussianNB(),
+              "RandomForest": RandomForestClassifier(max_depth=None, min_samples_leaf=1,
+                                          min_samples_split=2, n_estimators=50, random_state=12),
+              "MLP": MLPClassifier(hidden_layer_sizes=(100,), max_iter=500, random_state=2)}
+
+# For loop iterates through each csv file and runs each model/estimator over each combination pair.
+for estimator_name, estimator_object in estimators.items():
+    j=0
+    while j < 15:
+        tail = 'updated_col_{}.csv'.format(j)
+        path = base_path + str(tail)
+        two_col_df = pd.read_csv(path)
+
+        X_train, X_test, y_train, y_test = train_test_split(two_col_df, y, random_state=12, test_size=0.2)
+        kfold = KFold(n_splits=5, random_state=42, shuffle=True) # changed fold to 5
+        scores = cross_val_score(estimator=estimator_object, X=two_col_df, y=y, cv=kfold)
+
+        print(f"{estimator_name:>25}: " + f"mean accuracy={scores.mean():.2%}; " + f"std={scores.std():.2%}." +
+              f"For the feature combinations of {feature_list[j][0]} and {feature_list[j][1]}.")
+        j += 1
+
+# Creates a list with headers in it.
+header_list = list(new_df)
+
+# Visualizing Random Forest: Tree plot
+# Creates image containing 5 decision trees. Saves image to PythonProjects folder.
+fn = header_list[:-1]
+cn = ['No', 'Yes']
+fig, axes = plt.subplots(nrows=1, ncols=5, figsize=(10, 2), dpi=3000)
+for index in range(0, 5):
+    tree.plot_tree(clf.estimators_[index],
+                   feature_names=fn,
+                   class_names=cn,
+                   filled=True,
+                   ax=axes[index])
+
+    axes[index].set_title('Decision Tree: ' + str(index), fontsize=11)
+fig.savefig('clf_5_trees_Image_.png')
+
+# Creates figure containing an individual decision tree. Saves image to PythonProjects folder.
+fn = header_list[:-1]
+cn = ['No', 'Yes']
+fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(4, 4), dpi=800)
+tree.plot_tree(clf.estimators_[0],
+               feature_names=fn,
+               class_names=cn,
+               filled=True)
+fig.savefig('clf_individual_tree_Image_.png')
