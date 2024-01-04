@@ -11,7 +11,7 @@ https://www.oasis-brains.org/
 ### Pre-Processing
 The data set sourced from OASIS was cleaned, underwent some feature engineering. Columns where values were equal to and greater than 50% of the observations were removed. All missing values were removed from the dataset.
 ### Classifier Models
-Multiple classifier models were tested for performance in this program. The selected ML was selected best on the best accuracy.
+Multiple classifier models (Random Forest, KNN, SVC, MLP, and Gaussian NB) were tested for performance in this program. The selected ML was selected based on the best mean accuracy.
 
 ## Visualizing MRI Images in 3D Slicer
 ### Goal
