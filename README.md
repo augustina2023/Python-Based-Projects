@@ -1,6 +1,10 @@
 # Python-Based-Projects
-
-Each file is a Python-based project that I worked on throughout 2023. IDEs, such as Pycharm and Jupyter Notebook, were used in the creations of these programs.
+Each file is a Python-based project that I worked on throughout 2023. IDEs, such as Pycharm and Jupyter Notebook, were used in the creations of these programs. 
+- Pycharm Version:
+  PyCharm 2023.1.3 (Community Edition), Build #PC-231.9161.41, built on June 20, 2023, Windows 11.0, GC: G1 Young Generation, G1 Old Generation
+- Python Version:
+  Python 3.11
+- Jupyter Notebook:
 
 
 ## Alzheimer's Disease Project
@@ -15,11 +19,6 @@ The data set sourced from OASIS was cleaned, underwent some feature engineering.
 Multiple classifier models (Random Forest, KNN, SVC, MLP, and Gaussian NB) were tested for performance in this program. The selected ML was selected based on the best mean accuracy.
 
 
-## Visualizing MRI Images in 3D Slicer
-### Goal
-The purpose of this program was to explore and visualize medical images in 3D Slicer and Simple ITK and to apply simple transformations to the images.
-
-
 ## Segmentation of MRI Images
 ### Goal 
 The purpose of this program is to enhance the MRI images in order to create segmentation masks that allow for computational visualization of tumours in the prostate.
@@ -28,3 +27,9 @@ In this section, several things were done: volume pre-processing, testing of dif
 In the pre-processing step, the volume was rescaled to the range 0-255. Due to the large number of grey pixels in the volume, enhancing filters were used to brighten the image. The Median filter, Mean filter, and the Intensity Window filters were tried and tested. From there, thresholding was performed for the segmentation phase using the Binary Threshold Filter, and a combination of the Binary and Median filters, and the Confidence Connected. Finally, a clean up was performed on the selected segmentation filter using a vector filter which implements binary morphological operations, such as Binary Morphological Opening and Binary Morphological Closing.
 ### Main
 Main function that calls the functions in the 'utils.py' file.
+
+
+## Visualizing MRI Images in 3D Slicer
+### Goal
+The purpose of this program was to explore and visualize medical images in 3D Slicer and Simple ITK and to apply simple transformations to the images.
+
