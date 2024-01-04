@@ -1,5 +1,5 @@
 # This program creates different classifiers (Random Forest, KNN, SVC, MLP, and Gaussian NB), compares them to each other to see which model is superior.
-# The goal is to determine which ML model is able to draw strong correlations between the predictors that contribute to CDR scores in patients with AD.
+# The goal is to determine which ML model is able to draw strong correlations between the paired predictors that contribute to CDR scores in patients with AD.
 
 # Set X (predictors) and y (outcome)
 X = new_df[['Age', 'Educ', 'SES', 'MMSE', 'nWBV']]
@@ -86,6 +86,71 @@ for estimator_name, estimator_object in estimators.items():
         print(f"{estimator_name:>25}: " + f"mean accuracy={scores.mean():.2%}; " + f"std={scores.std():.2%}." +
               f"For the feature combinations of {feature_list[j][0]} and {feature_list[j][1]}.")
         j += 1
+
+
+#  Tuning RF
+#Made decision to tune all 6 features at once instead of each individual combination. This decision was made knowing there would be a trade off between efficieny and accuracy
+rf_classifier = RandomForestClassifier(n_estimators = 100, random_state = 12)
+#define the parameter grid for hyperparamter tuning
+param_grid = {
+    'n_estimators':[50,100,200],
+    'max_depth':[None,5,10],
+    'min_samples_split':[2,5,10],
+    'min_samples_leaf':[1,2,4]
+}
+
+# Create GridSearchCV object for hyperparameter tuning.
+grid_search = GridSearchCV(estimator=rf_classifier, param_grid=param_grid, cv=kfold)
+
+# Perform hyperparameter tuning.
+grid_search.fit(df_noCDR, target)
+
+# Get the best parameters and best score.
+best_params = grid_search.best_params_
+best_score = grid_search.best_score_
+
+# Print the best parameters and best score.
+print("Best Parameters: ", best_params)
+print("Best Score: {:.2f}%".format(best_score * 100))
+
+# K-Fold cross-validation (using 5-fold cv)
+kfold = KFold(n_splits=5, random_state=12, shuffle=True)
+rf_classifier = RandomForestClassifier(n_estimators = 100, random_state = 12)
+
+
+#Cross validation for our Random Forest model using hyper-parameters from above tuning.
+j = 0
+validation_lst = []
+rf_classifier = RandomForestClassifier(n_estimators = 50, max_depth = 5, min_samples_leaf = 1, 
+                                       min_samples_split = 5, random_state = 12)
+target = new_df['CDR Y/N']
+
+while j < 15:
+    tail = 'updated_columns_{}.csv'.format(j)
+    path = os.path.join(base_path,tail)
+    two_column_df = pd.read_csv(path)
+    scores = cross_val_score(estimator=rf_classifier, X=two_column_df, y=target, cv=kfold)
+    avg = scores.mean()
+    validation_lst.append(avg)
+    stdev = scores.std()
+    print("The mean for the feature combination of {} and {} is {:.2%}.\n".format(combos[j][0], combos[j][1],
+                                                                                   avg))
+    #print("The stdeviation for the feature combination of {} and {} is {:.2%}.".format(combos[j][0], combos[j][1],
+                                                                                  # stdev))
+    j+=1
+
+
+# Plot accuracies
+y = ['M/F & Age','M/F & Educ', 'M/F & SES','M/F & MMSE','M/F & nWBV', 'Age & Educ','Age & SES',
+    'Age & MMSE', 'Age & nWBV', 'Educ & SES', 'Educ & MMSE', 'Educ & nWBV', 'MMSE & SES', 'nWBV & SES',
+    'MMSE & nWBV']
+
+plt.barh(y, validation_lst,color='mediumaquamarine')
+plt.title("Mean accuracies for the cross validation")
+plt.xlabel("Mean accuracy")
+plt.ylabel("Feature Combinations")
+plt.show()
+
 
 # Creates a list with headers in it.
 header_list = list(new_df)
