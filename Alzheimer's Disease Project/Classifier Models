@@ -20,7 +20,7 @@ expected = y_test
 print('The accuracy is ', f'{clf.score(X_test, y_test):.2%}')
 
 # Create a loop that takes 2 columns at a time to determine the accuracy (in classifier)
-base_path = 'C:/Users/augustina/Documents/802/report 802/'
+base_path = 'C:/Users/augustina/Documents/AlzheimerProj'
 file_path = base_path + 'AD_w_YN_CDR.csv'
 diff_df = pd.read_csv(file_path)
 
