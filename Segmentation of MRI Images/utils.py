@@ -1,6 +1,5 @@
 # This program is intended to help urologists in planning fusion biopsies using MRI images of the prostate. Segmentation
 # of the prostate, accuracy evaluation of the segmentation mask, and extracting tissue information is performed.
-# Augustina Ashie: 20411977
 # Date created: July 16, 2023,          Last modified: July 21, 2023, 20:00
 
 # ----------------------------------------------------------------------------------------------------------------------
